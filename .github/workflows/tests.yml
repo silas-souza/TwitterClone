@@ -28,7 +28,15 @@ jobs:
         run: poetry install
 
       - name: Run Django checks
+        env:
+          SECRET_KEY: test-secret-key-for-github-actions
+          DEBUG: "True"
+          ALLOWED_HOSTS: 127.0.0.1,localhost
         run: poetry run python manage.py check
 
       - name: Run tests
+        env:
+          SECRET_KEY: test-secret-key-for-github-actions
+          DEBUG: "True"
+          ALLOWED_HOSTS: 127.0.0.1,localhost
         run: poetry run python manage.py test
