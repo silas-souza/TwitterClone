@@ -35,7 +35,6 @@
 
 <main class="container">
 
-
     <!-- PERFIL -->
 
     <section class="profile-card">
@@ -58,7 +57,19 @@
         </div>
 
 
-        <h1>@{{ profile_user.username }}</h1>
+        <h1>
+            {% if profile_user.first_name %}
+                {{ profile_user.first_name }}
+            {% else %}
+                @{{ profile_user.username }}
+            {% endif %}
+        </h1>
+
+
+        <p>
+            @{{ profile_user.username }}
+        </p>
+
 
         <p class="profile-email">
             {{ profile_user.email }}
@@ -85,11 +96,35 @@
         </div>
 
 
+        <!-- MENSAGENS -->
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
         <!-- EDITAR PERFIL -->
 
-        <form method="post" enctype="multipart/form-data">
+        <form
+            method="post"
+            enctype="multipart/form-data"
+        >
 
             {% csrf_token %}
+
+
+            <h2>Editar perfil</h2>
+
+
+            <!-- NOME DE USUÁRIO -->
 
             <label for="username">
                 Nome de usuário
@@ -100,9 +135,26 @@
                 type="text"
                 name="username"
                 value="{{ profile_user.username }}"
-                required
+                placeholder="Nome de usuário"
             >
 
+
+            <!-- NOME -->
+
+            <label for="first_name">
+                Nome
+            </label>
+
+            <input
+                id="first_name"
+                type="text"
+                name="first_name"
+                value="{{ profile_user.first_name }}"
+                placeholder="Seu nome"
+            >
+
+
+            <!-- E-MAIL -->
 
             <label for="email">
                 E-mail
@@ -113,8 +165,11 @@
                 type="email"
                 name="email"
                 value="{{ profile_user.email }}"
+                placeholder="Seu e-mail"
             >
 
+
+            <!-- FOTO -->
 
             <label for="profile_picture">
                 Foto de perfil
@@ -128,6 +183,52 @@
             >
 
 
+            <!-- SENHA -->
+
+            <h2>Alterar senha</h2>
+
+            <p>
+                Deixe os campos de senha vazios
+                se não quiser alterar sua senha.
+            </p>
+
+
+            <label for="current_password">
+                Senha atual
+            </label>
+
+            <input
+                id="current_password"
+                type="password"
+                name="current_password"
+                autocomplete="current-password"
+            >
+
+
+            <label for="new_password">
+                Nova senha
+            </label>
+
+            <input
+                id="new_password"
+                type="password"
+                name="new_password"
+                autocomplete="new-password"
+            >
+
+
+            <label for="new_password_confirm">
+                Confirmar nova senha
+            </label>
+
+            <input
+                id="new_password_confirm"
+                type="password"
+                name="new_password_confirm"
+                autocomplete="new-password"
+            >
+
+
             <button type="submit">
                 Salvar alterações
             </button>
@@ -136,6 +237,49 @@
 
     </section>
 
+
+    <!-- SEGUIDORES -->
+
+    <section class="following-section">
+
+        <h2>Seguidores</h2>
+
+        {% for user in profile_user.followers.all %}
+
+            <div class="following-card">
+
+                <div class="avatar">
+
+                    {% if user.profile_picture %}
+
+                        <img
+                            src="{{ user.profile_picture.url }}"
+                            alt="Foto de {{ user.username }}"
+                        >
+
+                    {% else %}
+
+                        {{ user.username|first|upper }}
+
+                    {% endif %}
+
+                </div>
+
+                <a href="{% url 'user_profile' user.id %}">
+                    @{{ user.username }}
+                </a>
+
+            </div>
+
+        {% empty %}
+
+            <p>
+                Você ainda não possui seguidores.
+            </p>
+
+        {% endfor %}
+
+    </section>
 
 
     <!-- SEGUINDO -->
@@ -165,7 +309,6 @@
 
                 </div>
 
-
                 <a href="{% url 'user_profile' user.id %}">
                     @{{ user.username }}
                 </a>
@@ -174,12 +317,13 @@
 
         {% empty %}
 
-            <p>Você ainda não segue ninguém.</p>
+            <p>
+                Você ainda não segue ninguém.
+            </p>
 
         {% endfor %}
 
     </section>
-
 
 
     <!-- PUBLICAÇÕES -->
@@ -187,7 +331,6 @@
     <section class="profile-posts">
 
         <h2>Minhas publicações</h2>
-
 
         {% for post in posts %}
 
@@ -247,7 +390,6 @@
 
             </article>
 
-
         {% empty %}
 
             <div class="empty-feed">
@@ -263,7 +405,6 @@
         {% endfor %}
 
     </section>
-
 
 </main>
 

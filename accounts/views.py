@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
@@ -95,16 +96,29 @@ def logout_view(request):
 
 @login_required
 def home(request):
+    # =========================================================
+    # FEED
+    # =========================================================
+    # O feed mostra somente publicações das pessoas que
+    # o usuário atual segue.
+    #
+    # A própria publicação NÃO aparece no feed.
+    # =========================================================
+
     following = request.user.following.all()
 
     posts = (
         Post.objects
-        .filter(author__in=[request.user, *following])
+        .filter(author__in=following)
         .select_related("author")
-        .prefetch_related("likes", "comments__author")
+        .prefetch_related(
+            "likes",
+            "comments__author",
+        )
         .order_by("-created_at")
     )
 
+    # Lista de usuários para seguir.
     users = (
         User.objects
         .exclude(id=request.user.id)
@@ -137,7 +151,10 @@ def create_post(request):
 
 @login_required
 def like_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+    )
 
     if request.user in post.likes.all():
         post.likes.remove(request.user)
@@ -149,10 +166,16 @@ def like_post(request, post_id):
 
 @login_required
 def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+    )
 
     if request.method == "POST":
-        content = request.POST.get("content", "").strip()
+        content = request.POST.get(
+            "content",
+            "",
+        ).strip()
 
         if content:
             Comment.objects.create(
@@ -166,7 +189,10 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
+    user = get_object_or_404(
+        User,
+        id=user_id,
+    )
 
     if user != request.user:
         request.user.following.add(user)
@@ -176,7 +202,10 @@ def follow_user(request, user_id):
 
 @login_required
 def unfollow_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
+    user = get_object_or_404(
+        User,
+        id=user_id,
+    )
 
     request.user.following.remove(user)
 
@@ -188,44 +217,175 @@ def profile(request):
     user = request.user
 
     if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        email = request.POST.get("email", "").strip()
 
-        # Atualiza o nome de usuário
+        # =====================================================
+        # NOME DE USUÁRIO
+        # =====================================================
+
+        username = request.POST.get(
+            "username",
+            "",
+        ).strip()
+
+        # Só altera se o campo tiver sido preenchido.
         if username:
-            existing = (
-                User.objects
-                .filter(username=username)
-                .exclude(id=user.id)
-                .exists()
-            )
 
-            if not existing:
-                user.username = username
+            if User.objects.filter(
+                username=username
+            ).exclude(
+                pk=user.pk
+            ).exists():
 
-        # Atualiza o e-mail
-        user.email = email
+                messages.error(
+                    request,
+                    "Esse nome de usuário já está sendo usado.",
+                )
 
-        # Atualiza a foto de perfil
-        profile_picture = request.FILES.get("profile_picture")
+                return redirect("profile")
+
+            user.username = username
+
+        # =====================================================
+        # NOME
+        # =====================================================
+
+        first_name = request.POST.get(
+            "first_name",
+            "",
+        ).strip()
+
+        # Só altera se o campo tiver sido preenchido.
+        if first_name:
+            user.first_name = first_name
+
+        # =====================================================
+        # E-MAIL
+        # =====================================================
+
+        email = request.POST.get(
+            "email",
+            "",
+        ).strip()
+
+        # Só altera se o campo tiver sido preenchido.
+        if email:
+            user.email = email
+
+        # =====================================================
+        # FOTO DE PERFIL
+        # =====================================================
+
+        profile_picture = request.FILES.get(
+            "profile_picture",
+        )
 
         if profile_picture:
             user.profile_picture = profile_picture
 
-        # Salva o usuário.
-        # O Cloudinary será responsável pelo upload da imagem.
-        if profile_picture:
-            user.save(update_fields=["username", "email", "profile_picture"])
-        else:
-            user.save(update_fields=["username", "email"])
+        # =====================================================
+        # SENHA
+        # =====================================================
+
+        current_password = request.POST.get(
+            "current_password",
+            "",
+        )
+
+        new_password = request.POST.get(
+            "new_password",
+            "",
+        )
+
+        new_password_confirm = request.POST.get(
+            "new_password_confirm",
+            "",
+        )
+
+        senha_alterada = False
+
+        # Só entra na alteração de senha se algum campo
+        # de senha tiver sido preenchido.
+        if (
+            current_password
+            or new_password
+            or new_password_confirm
+        ):
+
+            if not current_password:
+                messages.error(
+                    request,
+                    "Digite sua senha atual para alterar a senha.",
+                )
+
+                return redirect("profile")
+
+            if not user.check_password(
+                current_password
+            ):
+                messages.error(
+                    request,
+                    "A senha atual está incorreta.",
+                )
+
+                return redirect("profile")
+
+            if not new_password:
+                messages.error(
+                    request,
+                    "Digite a nova senha.",
+                )
+
+                return redirect("profile")
+
+            if len(new_password) < 8:
+                messages.error(
+                    request,
+                    "A nova senha deve ter pelo menos 8 caracteres.",
+                )
+
+                return redirect("profile")
+
+            if new_password != new_password_confirm:
+                messages.error(
+                    request,
+                    "As novas senhas não são iguais.",
+                )
+
+                return redirect("profile")
+
+            user.set_password(new_password)
+
+            senha_alterada = True
+
+        # =====================================================
+        # SALVAR
+        # =====================================================
+
+        user.save()
+
+        # Mantém o usuário conectado depois de trocar a senha.
+        if senha_alterada:
+            login(request, user)
+
+        messages.success(
+            request,
+            "Perfil atualizado com sucesso!",
+        )
 
         return redirect("profile")
+
+    # =========================================================
+    # PUBLICAÇÕES DO PRÓPRIO PERFIL
+    # =========================================================
 
     posts = (
         Post.objects
         .filter(author=user)
         .select_related("author")
-        .prefetch_related("likes", "comments__author")
+        .prefetch_related(
+            "likes",
+            "comments__author",
+        )
         .order_by("-created_at")
     )
 
@@ -243,13 +403,19 @@ def profile(request):
 
 @login_required
 def user_profile(request, user_id):
-    profile_user = get_object_or_404(User, id=user_id)
+    profile_user = get_object_or_404(
+        User,
+        id=user_id,
+    )
 
     posts = (
         Post.objects
         .filter(author=profile_user)
         .select_related("author")
-        .prefetch_related("likes", "comments__author")
+        .prefetch_related(
+            "likes",
+            "comments__author",
+        )
         .order_by("-created_at")
     )
 
@@ -262,7 +428,7 @@ def user_profile(request, user_id):
             "followers_count": profile_user.followers.count(),
             "following_count": profile_user.following.count(),
             "is_following": request.user.following.filter(
-                id=profile_user.id
+                id=profile_user.id,
             ).exists(),
         },
     )
