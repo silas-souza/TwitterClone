@@ -142,3 +142,116 @@ background: #0d8bd9;
     width: auto !important;
     min-width: 0 !important;
 }
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: #1d9bf0;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ESTATÍSTICAS DO PERFIL */
+
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin: 25px 0 30px;
+    padding: 20px 0;
+    border-top: 1px solid #e1e8ed;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.profile-stats div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-stats strong {
+    font-size: 22px;
+}
+
+.profile-stats span {
+    color: #657786;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* PUBLICAÇÕES DO PERFIL */
+
+.profile-posts {
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.profile-posts > h2 {
+    margin-bottom: 20px;
+}
+
+.profile-posts .post-card {
+    margin-bottom: 15px;
+}
+
+/* AVATAR COM FOTO */
+
+.avatar,
+.profile-avatar {
+    overflow: hidden;
+}
+
+.avatar img,
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* SEGUINDO */
+
+.following-section {
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.following-section h2 {
+    margin-bottom: 15px;
+}
+
+.following-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.following-card .avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+}
+
+.following-card a {
+    font-weight: 600;
+    text-decoration: none;
+    color: #14171a;
+}

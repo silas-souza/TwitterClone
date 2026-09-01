@@ -72,11 +72,20 @@
         <div class="post-header">
 
             <div class="avatar">
-                {{ post.author.username|first|upper }}
-            </div>
+    {% if post.author.profile_picture %}
+        <img
+            src="{{ post.author.profile_picture.url }}"
+            alt="Foto de {{ post.author.username }}"
+        >
+    {% else %}
+        {{ post.author.username|first|upper }}
+    {% endif %}
+</div>
 
             <div>
-                <strong>{{ post.author.username }}</strong>
+                <a href="{% url 'user_profile' post.author.id %}">
+                   <strong>{{ post.author.username }}</strong>
+                </a>
 
                 <small>
                     {{ post.created_at|date:"d/m/Y H:i" }}
@@ -107,48 +116,38 @@
 
         <div class="comments">
 
-            <h3>Comentários</h3>
+    {% for comment in post.comments.all %}
 
-            {% for comment in post.comments.all %}
-
-                <div class="comment">
-
-                    <strong>
-                        {{ comment.author.username }}
-                    </strong>
-
-                    <span>
-                        {{ comment.content }}
-                    </span>
-
-                </div>
-
-            {% empty %}
-
-                <p>Nenhum comentário ainda.</p>
-
-            {% endfor %}
-
-            <form method="post"
-                  action="{% url 'add_comment' post.id %}">
-
-                {% csrf_token %}
-
-                <input
-                    type="text"
-                    name="content"
-                    placeholder="Escreva um comentário..."
-                    required
-                >
-
-                <button type="submit">
-                    Comentar
-                </button>
-
-            </form>
-
+        <div class="comment">
+            <strong>{{ comment.author.username }}</strong>
+            <span>{{ comment.content }}</span>
         </div>
 
+    {% empty %}
+
+        <p>Nenhum comentário ainda.</p>
+
+    {% endfor %}
+
+
+    <form method="post" action="{% url 'add_comment' post.id %}">
+
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="content"
+            placeholder="Escreva um comentário..."
+            required
+        >
+
+        <button type="submit">
+            Comentar
+        </button>
+
+    </form>
+
+</div>
     </article>
 
     {% empty %}

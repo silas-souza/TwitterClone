@@ -196,8 +196,47 @@ def profile(request):
 
         return redirect("profile")
 
+    posts = (
+        Post.objects
+        .filter(author=user)
+        .select_related("author")
+        .prefetch_related("likes", "comments__author")
+        .order_by("-created_at")
+    )
+
     return render(
         request,
         "accounts/profile.html",
-        {"profile_user": user},
+        {
+            "profile_user": user,
+            "posts": posts,
+            "followers_count": user.followers.count(),
+            "following_count": user.following.count(),
+        },
+    )
+
+@login_required
+def user_profile(request, user_id):
+    profile_user = get_object_or_404(User, id=user_id)
+
+    posts = (
+        Post.objects
+        .filter(author=profile_user)
+        .select_related("author")
+        .prefetch_related("likes", "comments__author")
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "accounts/user_profile.html",
+        {
+            "profile_user": profile_user,
+            "posts": posts,
+            "followers_count": profile_user.followers.count(),
+            "following_count": profile_user.following.count(),
+            "is_following": request.user.following.filter(
+                id=profile_user.id
+            ).exists(),
+        },
     )

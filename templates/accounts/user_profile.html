@@ -6,8 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Meu Perfil - Twitter Clone</title>
+    <title>Perfil - Twitter Clone</title>
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
@@ -35,9 +34,6 @@
 
 <main class="container">
 
-
-    <!-- PERFIL -->
-
     <section class="profile-card">
 
         <div class="profile-avatar">
@@ -56,7 +52,6 @@
             {% endif %}
 
         </div>
-
 
         <h1>@{{ profile_user.username }}</h1>
 
@@ -85,109 +80,44 @@
         </div>
 
 
-        <!-- EDITAR PERFIL -->
+        {% if request.user != profile_user %}
 
-        <form method="post" enctype="multipart/form-data">
+            {% if is_following %}
 
-            {% csrf_token %}
+                <form method="post"
+                      action="{% url 'unfollow_user' profile_user.id %}">
 
-            <label for="username">
-                Nome de usuário
-            </label>
+                    {% csrf_token %}
 
-            <input
-                id="username"
-                type="text"
-                name="username"
-                value="{{ profile_user.username }}"
-                required
-            >
+                    <button type="submit">
+                        Deixar de seguir
+                    </button>
 
+                </form>
 
-            <label for="email">
-                E-mail
-            </label>
+            {% else %}
 
-            <input
-                id="email"
-                type="email"
-                name="email"
-                value="{{ profile_user.email }}"
-            >
+                <form method="post"
+                      action="{% url 'follow_user' profile_user.id %}">
 
+                    {% csrf_token %}
 
-            <label for="profile_picture">
-                Foto de perfil
-            </label>
+                    <button type="submit">
+                        Seguir
+                    </button>
 
-            <input
-                id="profile_picture"
-                type="file"
-                name="profile_picture"
-                accept="image/*"
-            >
+                </form>
 
+            {% endif %}
 
-            <button type="submit">
-                Salvar alterações
-            </button>
-
-        </form>
+        {% endif %}
 
     </section>
 
-
-
-    <!-- SEGUINDO -->
-
-    <section class="following-section">
-
-        <h2>Seguindo</h2>
-
-        {% for user in profile_user.following.all %}
-
-            <div class="following-card">
-
-                <div class="avatar">
-
-                    {% if user.profile_picture %}
-
-                        <img
-                            src="{{ user.profile_picture.url }}"
-                            alt="Foto de {{ user.username }}"
-                        >
-
-                    {% else %}
-
-                        {{ user.username|first|upper }}
-
-                    {% endif %}
-
-                </div>
-
-
-                <a href="{% url 'user_profile' user.id %}">
-                    @{{ user.username }}
-                </a>
-
-            </div>
-
-        {% empty %}
-
-            <p>Você ainda não segue ninguém.</p>
-
-        {% endfor %}
-
-    </section>
-
-
-
-    <!-- PUBLICAÇÕES -->
 
     <section class="profile-posts">
 
-        <h2>Minhas publicações</h2>
-
+        <h2>Publicações de @{{ profile_user.username }}</h2>
 
         {% for post in posts %}
 
@@ -196,42 +126,22 @@
                 <div class="post-header">
 
                     <div class="avatar">
-
-                        {% if post.author.profile_picture %}
-
-                            <img
-                                src="{{ post.author.profile_picture.url }}"
-                                alt="Foto de {{ post.author.username }}"
-                            >
-
-                        {% else %}
-
-                            {{ post.author.username|first|upper }}
-
-                        {% endif %}
-
+                        {{ post.author.username|first|upper }}
                     </div>
 
-
                     <div>
-
-                        <strong>
-                            {{ post.author.username }}
-                        </strong>
+                        <strong>{{ post.author.username }}</strong>
 
                         <small>
                             {{ post.created_at|date:"d/m/Y H:i" }}
                         </small>
-
                     </div>
 
                 </div>
 
-
                 <p class="post-content">
                     {{ post.content }}
                 </p>
-
 
                 <div class="post-actions">
 
@@ -247,7 +157,6 @@
 
             </article>
 
-
         {% empty %}
 
             <div class="empty-feed">
@@ -255,7 +164,7 @@
                 <h2>Nenhuma publicação</h2>
 
                 <p>
-                    Você ainda não publicou nada.
+                    Este usuário ainda não publicou nada.
                 </p>
 
             </div>
@@ -264,9 +173,7 @@
 
     </section>
 
-
 </main>
 
 </body>
-
 </html>
