@@ -14,8 +14,8 @@ def login_view(request):
         return redirect("home")
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
 
         user = authenticate(
             request,
@@ -30,7 +30,9 @@ def login_view(request):
         return render(
             request,
             "accounts/login.html",
-            {"error": "Usuário ou senha inválidos."},
+            {
+                "error": "Usuário ou senha inválidos.",
+            },
         )
 
     return render(request, "accounts/login.html")
@@ -41,29 +43,35 @@ def register_view(request):
         return redirect("home")
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "")
 
         if not username or not password:
             return render(
                 request,
                 "accounts/register.html",
-                {"error": "Usuário e senha são obrigatórios."},
+                {
+                    "error": "Usuário e senha são obrigatórios.",
+                },
             )
 
         if User.objects.filter(username=username).exists():
             return render(
                 request,
                 "accounts/register.html",
-                {"error": "Esse usuário já existe."},
+                {
+                    "error": "Esse usuário já existe.",
+                },
             )
 
         if len(password) < 8:
             return render(
                 request,
                 "accounts/register.html",
-                {"error": "A senha deve ter pelo menos 8 caracteres."},
+                {
+                    "error": "A senha deve ter pelo menos 8 caracteres.",
+                },
             )
 
         user = User.objects.create_user(
@@ -73,6 +81,7 @@ def register_view(request):
         )
 
         login(request, user)
+
         return redirect("home")
 
     return render(request, "accounts/register.html")
@@ -89,15 +98,18 @@ def home(request):
     following = request.user.following.all()
 
     posts = (
-        Post.objects.filter(
-            author__in=[request.user, *following]
-        )
+        Post.objects
+        .filter(author__in=[request.user, *following])
         .select_related("author")
         .prefetch_related("likes", "comments__author")
         .order_by("-created_at")
     )
 
-    users = User.objects.exclude(id=request.user.id).order_by("username")
+    users = (
+        User.objects
+        .exclude(id=request.user.id)
+        .order_by("username")
+    )
 
     return render(
         request,
@@ -179,20 +191,33 @@ def profile(request):
         username = request.POST.get("username", "").strip()
         email = request.POST.get("email", "").strip()
 
+        # Atualiza o nome de usuário
         if username:
-            existing = User.objects.filter(
-                username=username
-            ).exclude(id=user.id).exists()
+            existing = (
+                User.objects
+                .filter(username=username)
+                .exclude(id=user.id)
+                .exists()
+            )
 
             if not existing:
                 user.username = username
 
+        # Atualiza o e-mail
         user.email = email
 
-        if request.FILES.get("profile_picture"):
-            user.profile_picture = request.FILES["profile_picture"]
+        # Atualiza a foto de perfil
+        profile_picture = request.FILES.get("profile_picture")
 
-        user.save()
+        if profile_picture:
+            user.profile_picture = profile_picture
+
+        # Salva o usuário.
+        # O Cloudinary será responsável pelo upload da imagem.
+        if profile_picture:
+            user.save(update_fields=["username", "email", "profile_picture"])
+        else:
+            user.save(update_fields=["username", "email"])
 
         return redirect("profile")
 
@@ -214,6 +239,7 @@ def profile(request):
             "following_count": user.following.count(),
         },
     )
+
 
 @login_required
 def user_profile(request, user_id):
