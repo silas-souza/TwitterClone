@@ -22,3 +22,9 @@ staticfiles/
 
 # Pytest
 .pytest_cache/
+
+.env
+.venv/
+__pycache__/
+*.pyc
+db.sqlite3
