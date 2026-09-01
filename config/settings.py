@@ -16,6 +16,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
 
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/login/"
+
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config(
@@ -23,8 +27,6 @@ ALLOWED_HOSTS = config(
     default="127.0.0.1,localhost",
     cast=lambda value: [host.strip() for host in value.split(",")],
 )
-
-
 # ============================================================
 # APPLICATIONS
 # ============================================================
