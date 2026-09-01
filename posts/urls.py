@@ -5,7 +5,7 @@ from .views import CommentViewSet, PostViewSet
 
 
 router = DefaultRouter()
-router.register("", PostViewSet, basename="post")
+router.register("posts", PostViewSet, basename="post")
 
 
 comment_list = CommentViewSet.as_view({
@@ -23,13 +23,13 @@ urlpatterns = [
     path("", include(router.urls)),
 
     path(
-        "<int:post_id>/comments/",
+        "posts/<int:post_id>/comments/",
         comment_list,
         name="comment-list",
     ),
 
     path(
-        "<int:post_id>/comments/<int:pk>/",
+        "posts/<int:post_id>/comments/<int:pk>/",
         comment_detail,
         name="comment-detail",
     ),
