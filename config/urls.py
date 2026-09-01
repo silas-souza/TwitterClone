@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/users/", include("users.urls")),
     path("api/token/", obtain_auth_token, name="api_token_auth"),
     path("api/", include("posts.urls")),
+    path("", include("accounts.urls")),
 ]
 
 if settings.DEBUG:

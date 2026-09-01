@@ -1,0 +1,221 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Clone</title>
+
+```
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+```
+
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+
+```
+    <a href="{% url 'home' %}" class="logo">
+        Twitter Clone
+    </a>
+
+    <nav>
+        <a href="{% url 'home' %}">Início</a>
+        <a href="{% url 'profile' %}">Meu perfil</a>
+        <a href="{% url 'logout' %}">Sair</a>
+    </nav>
+
+</div>
+```
+
+</header>
+
+<main class="container">
+
+```
+<section class="welcome">
+    <h1>Seu Feed</h1>
+    <p>Veja as publicações das pessoas que você segue.</p>
+</section>
+
+<section class="post-box">
+
+    <h2>O que está acontecendo?</h2>
+
+    <form method="post" action="{% url 'create_post' %}">
+        {% csrf_token %}
+
+        <textarea
+            name="content"
+            placeholder="Escreva uma postagem..."
+            required
+        ></textarea>
+
+        <button type="submit">
+            Publicar
+        </button>
+    </form>
+
+</section>
+
+<section class="feed">
+
+    {% for post in posts %}
+
+    <article class="post-card">
+
+        <div class="post-header">
+
+            <div class="avatar">
+                {{ post.author.username|first|upper }}
+            </div>
+
+            <div>
+                <strong>{{ post.author.username }}</strong>
+
+                <small>
+                    {{ post.created_at|date:"d/m/Y H:i" }}
+                </small>
+            </div>
+
+        </div>
+
+        <p class="post-content">
+            {{ post.content }}
+        </p>
+
+        <div class="post-actions">
+
+            <form method="post" action="{% url 'like_post' post.id %}">
+                {% csrf_token %}
+
+                <button type="submit">
+                    ❤️ Curtir ({{ post.likes.count }})
+                </button>
+            </form>
+
+            <span>
+                💬 {{ post.comments.count }}
+            </span>
+
+        </div>
+
+        <div class="comments">
+
+            <h3>Comentários</h3>
+
+            {% for comment in post.comments.all %}
+
+                <div class="comment">
+
+                    <strong>
+                        {{ comment.author.username }}
+                    </strong>
+
+                    <span>
+                        {{ comment.content }}
+                    </span>
+
+                </div>
+
+            {% empty %}
+
+                <p>Nenhum comentário ainda.</p>
+
+            {% endfor %}
+
+            <form method="post"
+                  action="{% url 'add_comment' post.id %}">
+
+                {% csrf_token %}
+
+                <input
+                    type="text"
+                    name="content"
+                    placeholder="Escreva um comentário..."
+                    required
+                >
+
+                <button type="submit">
+                    Comentar
+                </button>
+
+            </form>
+
+        </div>
+
+    </article>
+
+    {% empty %}
+
+    <div class="empty-feed">
+
+        <h2>Seu feed está vazio</h2>
+
+        <p>
+            Comece seguindo outros usuários para ver
+            as publicações deles.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</section>
+
+<section class="users">
+
+    <h2>Encontrar usuários</h2>
+
+    {% for user in users %}
+
+        <div class="user-card">
+
+            <strong>
+                {{ user.username }}
+            </strong>
+
+            {% if user in request.user.following.all %}
+
+                <form method="post"
+                      action="{% url 'unfollow_user' user.id %}">
+
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Deixar de seguir
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <form method="post"
+                      action="{% url 'follow_user' user.id %}">
+
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Seguir
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+</section>
+```
+
+</main>
+
+</body>
+</html>

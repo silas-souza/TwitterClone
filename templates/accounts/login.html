@@ -1,0 +1,64 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TwitterClone</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<div class="auth-container">
+    <div class="card">
+
+        <h1 class="auth-title">TwitterClone</h1>
+
+        <h2>Entrar</h2>
+
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Usuário</label>
+                <input
+                    type="text"
+                    name="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <input
+                    type="password"
+                    name="password"
+                    required
+                >
+            </div>
+
+            <button type="submit">
+                Entrar
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Ainda não possui conta?
+            <a href="{% url 'register' %}">
+                Criar conta
+            </a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
