@@ -1,119 +1,72 @@
-# Twitter Clone API
+# Twitter Clone
 
-API REST desenvolvida com Django e Django REST Framework como projeto final do curso.
-
-A aplicação simula funcionalidades básicas de uma rede social de microblog, permitindo cadastro de usuários, autenticação, gerenciamento de perfil, criação de postagens, seguidores, curtidas e comentários.
-
-## Tecnologias
-
-* Python 3.13
-* Django 6.1
-* Django REST Framework
-* Poetry
-* PostgreSQL
-* Neon
-* Token Authentication
-* Gunicorn
-* Render
-* Git e GitHub
+Projeto desenvolvido com Django, simulando as principais funcionalidades de uma rede social.
 
 ## Funcionalidades
 
-### Usuários
+- Cadastro de usuários
+- Login e logout
+- Alteração de perfil
+- Alteração de nome de usuário
+- Alteração de nome
+- Alteração de e-mail
+- Alteração de foto de perfil
+- Alteração de senha
+- Sistema de seguidores
+- Sistema de seguir e deixar de seguir usuários
+- Feed com publicações dos usuários seguidos
+- Criação de publicações
+- Curtidas
+- Comentários
+- API REST
+- Banco de dados PostgreSQL
+- Upload de imagens utilizando Cloudinary
+- Deploy online utilizando Render
 
-* Cadastro de usuários
-* Autenticação por Token
-* Consulta do próprio perfil
-* Atualização do perfil
-* Foto de perfil
-* Seguir usuários
-* Lista de usuários seguidos
+## Tecnologias
 
-### Postagens
+- Python
+- Django
+- Django REST Framework
+- PostgreSQL
+- Cloudinary
+- HTML
+- CSS
+- Render
+- GitHub
 
-* Criar postagem
-* Listar postagens
-* Atualizar postagem
-* Excluir postagem
-* Feed baseado em usuários seguidos
+## Como executar localmente
 
-### Curtidas
+Clone o projeto:
 
-* Curtir uma postagem
-* Remover curtida
-* Contagem de curtidas
-* Impedir curtida duplicada
+    git clone https://github.com/silas-souza/TwitterClone.git
 
-### Comentários
+Entre na pasta:
 
-* Criar comentário
-* Listar comentários
-* Excluir comentário
-* Identificação automática do autor
-
-## Banco de dados
-
-O projeto utiliza PostgreSQL em produção através do Neon.
-
-A conexão com o banco é configurada por meio de variáveis de ambiente, mantendo as credenciais fora do código-fonte.
-
-## Deploy
-
-A API está publicada em produção utilizando Render.
-
-URL da API:
-
-https://twitterclone-6s3i.onrender.com/
-
-Endpoint principal:
-
-https://twitterclone-6s3i.onrender.com/api/
-
-## Instalação
-
-Clone o repositório:
-
-```bash
-git clone https://github.com/silas-souza/TwitterClone.git
-cd TwitterClone
-```
+    cd TwitterClone
 
 Instale as dependências:
 
-```bash
-poetry install
-```
-
-Configure as variáveis de ambiente necessárias.
+    poetry install
 
 Execute as migrações:
 
-```bash
-poetry run python manage.py migrate
-```
+    poetry run python manage.py migrate
 
-Execute o servidor local:
+Inicie o servidor:
 
-```bash
-poetry run python manage.py runserver
-```
+    poetry run python manage.py runserver
 
-## Testes
+Acesse:
 
-Para executar os testes automatizados:
+    http://127.0.0.1:8000/
 
-```bash
-poetry run python manage.py test
-```
+## Deploy
 
-O projeto possui testes automatizados para validar suas principais funcionalidades.
+Aplicação disponível online:
 
-## Produção
+https://twitterclone-6s3i.onrender.com
 
-Para executar a aplicação utilizando Gunicorn:
+## GitHub
 
-```bash
-gunicorn config.wsgi:application
-```
-
-O deploy em produção utiliza o PostgreSQL do Neon e o serviço Web do Render.
+https://github.com/silas-souza/TwitterClone
