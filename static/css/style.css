@@ -275,3 +275,17 @@ background: #0d8bd9;
 .auth-card input {
     width: 100%;
 }
+
+.auth-card {
+    width: 100%;
+    max-width: 450px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+}
+
+.auth-card button {
+    width: 100%;
+}
